@@ -1,0 +1,531 @@
+//+++++++++++++++++++++++++++++++++++++++++++++++++++
+//1. Тестирование настройки config из git
+//+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//+++++++++++++++++++++++app-discovery+++++++++++++++++++++++++++++
+
+package com.bodrov.spring.appdiscovery;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
+@EnableEurekaServer
+@SpringBootApplication
+public class AppDiscoveryApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(AppDiscoveryApplication.class, args);
+	}
+}
+
+//++++++++++++++++++++++++контроллер+++++++++++++++++++++++
+
+package com.bodrov.spring.appdiscovery;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RefreshScope
+@RestController
+public class MyController {
+
+    @Value("${developer.email}")
+    private String email;
+
+    @RequestMapping("/test")
+    public String test(){return email;}
+}
+
+//+++++++++++++++++++++++properties++++++++++++++++++++++++++++++++
+
+server.port=8761
+spring.application.name=app-discovery
+
+//+++++++++++++++++++++pom.xml+++++++++++++++++++++++++++++++++++++
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.bodrov.spring</groupId>
+	<artifactId>app-discovery</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>app-discovery</name>
+	<description>Demo project for Spring Boot</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.5.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<spring.version>5.0.6.RELEASE</spring.version>
+		<star-class>com.bodrov.spring.appdiscovery.AppDiscoveryApplication</star-class>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>Finchley.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka-server</artifactId>
+			<version>1.4.5.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-netflix-eureka-server</artifactId>
+            <version>2.0.1.RELEASE</version>
+        </dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>app-discovery</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+
+//++++++++++++++++++++++++++MyServerSpring++++++++++++++++++++++++++++++
+
+@EnableConfigServer
+@SpringBootApplication
+public class MyServerSpringApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(MyServerSpringApplication.class, args);
+	}
+}
+
+//+++++++++++++++++++++++properties+++++++++++++++++++++++++++++++++++++
+
+spring.application.name=MyServerSpring
+server.port=8888
+
+spring.cloud.config.server.git.force = true
+spring.cloud.config.server.git.uri = https://github.com/Ysroslav/MyServerSpring.git
+
+//++++++++++++++++++++pom.xml++++++++++++++++++++++++++++++++++++++++++++++
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.bodrov.spring</groupId>
+	<artifactId>MyServerSpring</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>MyServerSpring</name>
+	<description>Demo project for Spring Boot</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.5.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<spring.version>5.0.6.RELEASE</spring.version>
+		<star-class>com.bodrov.spring.MyServerSpring.MyServerSpringApplication</star-class>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>Finchley.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>MyServerSpring</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//2. Тестирование настройки микросервесной архитектуры
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//++++++++++++++++++++первое приложение+++++++++++++++++++++++++++++++++++++++++++
+
+package com.bodrov.spring.appsimplecalc.controller;
+
+import com.bodrov.spring.appsimplecalc.dto.NumberDTO;
+import com.bodrov.spring.appsimplecalc.dto.ResultDTO;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/calc")
+public class CalcController {
+
+    @RequestMapping(value="/ping", produces = "application/json")
+    public ResultDTO ping(){
+        return new ResultDTO();
+    }
+
+    @RequestMapping(value = "/sum", produces = "application/json")
+    public NumberDTO sum(@RequestParam(value = "a") final  Double a,
+                         @RequestParam(value = "b") final Double b){
+        return new NumberDTO(a+b);
+    }
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+package com.bodrov.spring.appsimplecalc.dto;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
+public class NumberDTO {
+
+    private Double value;
+
+    public NumberDTO(){}
+
+    public NumberDTO(Double value){this.value=value;}
+
+    public Double getValue() {
+        return value;
+    }
+
+    public void setValue(Double value) {
+        this.value = value;
+    }
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+package com.bodrov.spring.appsimplecalc.dto;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
+public class ResultDTO {
+
+    private Boolean success = false;
+
+    public Boolean getSuccess() {
+        return success;
+    }
+
+    public void setSuccess(Boolean success) {
+        this.success = success;
+    }
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+package com.bodrov.spring.appsimplecalc;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+@EnableFeignClients
+@EnableDiscoveryClient
+@SpringBootApplication
+public class AppSimpleCalcApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(AppSimpleCalcApplication.class, args);
+	}
+}
+
+//++++++++++++++++++++++второе приложение+++++++++++++++++++++++++++
+
+package com.bodrov.spring.appmymicroservice.client;
+
+import com.bodrov.spring.appmymicroservice.dto.NumberDTO;
+import com.bodrov.spring.appmymicroservice.dto.ResultDTO;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@RequestMapping(value="/api/calc")
+@FeignClient(name = "app-simple-calc")
+public interface CalcClient {
+
+    @RequestMapping(value = "/ping", produces = "application/json")
+    ResultDTO ping();
+
+    @RequestMapping(value = "/sum", produces = "application/json")
+    NumberDTO sum(@RequestParam(value = "a") final  Double a,
+                  @RequestParam(value = "b") final Double b);
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+package com.bodrov.spring.appmymicroservice.controller;
+
+import com.bodrov.spring.appmymicroservice.client.CalcClient;
+import com.bodrov.spring.appmymicroservice.dto.NumberDTO;
+import com.bodrov.spring.appmymicroservice.dto.ResultDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RefreshScope
+@RestController
+@RequestMapping("/api/test")
+public class MyController {
+
+    @Autowired(required = false)
+    private CalcClient calcClient;
+
+    @RequestMapping(value="/ping", produces = "application/json")
+    public ResultDTO ping(){
+        return new ResultDTO();
+    }
+
+    @RequestMapping(value = "/sum", produces = "application/json")
+    public NumberDTO sum(@RequestParam(value = "a") final  Double a,
+                         @RequestParam(value = "b") final Double b){
+        return calcClient.sum(a,b);
+    }
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+package com.bodrov.spring.appmymicroservice.dto;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
+public class NumberDTO {
+
+    private Double value;
+
+    public NumberDTO(){}
+
+    public NumberDTO(Double value){this.value=value;}
+
+    public Double getValue() {
+        return value;
+    }
+
+    public void setValue(Double value) {
+        this.value = value;
+    }
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+package com.bodrov.spring.appmymicroservice.dto;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
+public class ResultDTO {
+
+    private Boolean success = false;
+
+    public Boolean getSuccess() {
+        return success;
+    }
+
+    public void setSuccess(Boolean success) {
+        this.success = success;
+    }
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+package com.bodrov.spring.appmymicroservice;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+@EnableFeignClients
+@EnableDiscoveryClient
+@SpringBootApplication
+public class AppMyMicroServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(AppMyMicroServiceApplication.class, args);
+	}
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.bodrov.spring</groupId>
+	<artifactId>app-my-micro-service</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>app-my-micro-service</name>
+	<description>Demo project for Spring Boot</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.5.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>Finchley.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka-server</artifactId>
+			<version>1.4.5.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-netflix-eureka-server</artifactId>
+			<version>2.0.1.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
